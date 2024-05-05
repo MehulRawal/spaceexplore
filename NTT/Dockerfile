@@ -1,6 +1,6 @@
 FROM golang:latest
-WORKDIR /ntt
-COPY . /ntt
-RUN go build /ntt
-EXPOSE  8080
-CMD ["./NTT"]
+WORKDIR /app
+COPY . .
+RUN go mod download
+RUN go build -o main .
+CMD ["./main"]
