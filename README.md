@@ -75,8 +75,5 @@ NOTE : The ../NTT/storageinterface/init.sql contains SQL for creating planet_typ
 
 
 
-[local spaceexplore.postman_collection.json](https://github.com/MehulRawal/spaceexplore/files/15212932/local.spaceexplore.postman_collection.json)
-
-
-
+[spaceexplore.postman_collection.json](https://github.com/MehulRawal/spaceexplore/files/15213625/spaceexplore.postman_collection.json)
 
