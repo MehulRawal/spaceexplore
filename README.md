@@ -61,9 +61,7 @@ to maintain uniformity.
 
 
 
-
-
-
+[local spaceexplore.postman_collection.json](https://github.com/MehulRawal/spaceexplore/files/15212932/local.spaceexplore.postman_collection.json)
 
 
 
