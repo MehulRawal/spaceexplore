@@ -24,7 +24,6 @@ func DBInit() gin.HandlerFunc {
 		// Construct database connection string
 		dbURI := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPass, dbHost, dbPort, dbName)
 
-		fmt.Println(dbURI)
 		db, err := sql.Open("mysql", dbURI)
 		if err != nil {
 			log.Println("InitializeDB() error : ", err.Error())
