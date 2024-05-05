@@ -60,6 +60,20 @@ type Response struct {
 to maintain uniformity.
 
 
+I've kept the tow separated docker files. One for golang application and other for mysql. 
+
+Steps to run dockerfiles : 
+ 1. cd NTT
+ 2. docker build -t go-app .  // builds the golang program
+ 3. cd storageinterface
+ 4. docker build -t mysql-custom .
+ 5. docker run -d --name mysql-container mysql-custom
+ 6. docker run -d -p 8080:8080 --name go-app-container --link mysql-container:mysql go-app
+ 
+NOTE : The ../NTT/storageinterface/init.sql contains SQL for creating planet_type and exoplanet tables ans two records 'Gas Giant' and 'Terestial' in planet_type table.
+       Use PUT exoplanet api to create exoplanets.
+
+
 
 [local spaceexplore.postman_collection.json](https://github.com/MehulRawal/spaceexplore/files/15212932/local.spaceexplore.postman_collection.json)
 
