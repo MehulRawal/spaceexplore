@@ -18,7 +18,9 @@ func SetUpRoutes() *gin.Engine {
 	router.GET("/exoplanets", api.GetExoplanets)
 	router.GET("/exoplanet/:id", api.GetExoplanet)
 	router.PUT("/exoplanet", api.AddExoplanet)
-	router.POST("/exoplanet/:id", api.UpdateExoplanet)
+	router.PATCH("/exoplanet/:id", api.UpdateExoplanet)
+	router.DELETE("/exoplanet/:id", api.DeleteExoplanet)
+	router.POST("/exoplanet/fuel_estimate", api.GetFuelEstimation)
 	router.Use(models.DBClose())
 	return router
 }

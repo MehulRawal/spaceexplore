@@ -38,7 +38,7 @@ func CheckIfPlanetTypeExist(db *sql.DB, planetType string) (bool, error) {
 
 	var count int
 	selectCountPlanetTypeQuery := `Select count(*) from planet_types where planet_type = ?`
-	err := db.QueryRow(selectCountPlanetTypeQuery, planetType).Scan(count)
+	err := db.QueryRow(selectCountPlanetTypeQuery, planetType).Scan(&count)
 	if err != nil && err != sql.ErrNoRows {
 		log.Println("models.CheckIfPlanetTypeExist err in selectCountPlanetTypeQuery : ", err.Error())
 		return false, err
@@ -55,7 +55,7 @@ func CheckIfPlanetTypeByIDExist(db *sql.DB, id int) (bool, error) {
 
 	var count int
 	selectCountPlanetTypeByIDQuery := `Select count(*) from planet_types where id = ?`
-	err := db.QueryRow(selectCountPlanetTypeByIDQuery, id).Scan(count)
+	err := db.QueryRow(selectCountPlanetTypeByIDQuery, id).Scan(&count)
 	if err != nil && err != sql.ErrNoRows {
 		log.Println("models.CheckIfPlanetTypeByIDExist err in selectCountPlanetTypeByIDQuery : ", err.Error())
 		return false, err

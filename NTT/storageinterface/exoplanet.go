@@ -9,7 +9,7 @@ import (
 // currently assuming Mass in KG and Radius in Kms
 type ExoPlanet struct {
 	ID                int     `json:"id"`
-	Name              string  `json:"string"`
+	Name              string  `json:"name"`
 	Description       string  `json:"description"`
 	DistanceFromEarth int     `json:"distance_from_earth"`
 	Radius            float64 `json:"radius"`
@@ -27,9 +27,26 @@ func CheckIfNameAlreadyExist(db *sql.DB, name string) (bool, error) {
 
 	var count int
 	selectCountExoplanetByNameQuery := `Select count(*) from exoplanets where name = ?`
-	err := db.QueryRow(selectCountExoplanetByNameQuery, name).Scan(count)
+	err := db.QueryRow(selectCountExoplanetByNameQuery, name).Scan(&count)
 	if err != nil && err != sql.ErrNoRows {
 		log.Println("models.CheckIfNameAlreadyExist err in selectCountExoplanetByNameQuery : ", err.Error())
+		return false, err
+	}
+
+	if count > 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func CheckIfNameAlreadyExistWithOtherId(db *sql.DB, name string, id int) (bool, error) {
+
+	var count int
+	selectCountExoplanetByNameQuery := `Select count(*) from exoplanets where name = ? AND id != ?`
+	err := db.QueryRow(selectCountExoplanetByNameQuery, name, id).Scan(&count)
+	if err != nil && err != sql.ErrNoRows {
+		log.Println("models.CheckIfNameAlreadyExistWithOtherId err in selectCountExoplanetByNameQuery : ", err.Error())
 		return false, err
 	}
 
@@ -44,26 +61,9 @@ func CheckIfExoplanetExist(db *sql.DB, id int) (bool, error) {
 
 	var count int
 	selectCountExoplanetByIDQuery := `Select count(*) from exoplanets where id = ?`
-	err := db.QueryRow(selectCountExoplanetByIDQuery, id).Scan(count)
+	err := db.QueryRow(selectCountExoplanetByIDQuery, id).Scan(&count)
 	if err != nil && err != sql.ErrNoRows {
 		log.Println("models.CheckIfExoplanetExist err in selectCountExoplanetByIDQuery : ", err.Error())
-		return false, err
-	}
-
-	if count > 0 {
-		return true, nil
-	}
-
-	return false, nil
-}
-
-func CheckIfNameAlreadyExist(db *sql.DB, name string) (bool, error) {
-
-	var count int
-	selectCountExoplanetByNameQuery := `Select count(*) from exoplanets where name = ?`
-	err := db.QueryRow(selectCountExoplanetByNameQuery, name).Scan(count)
-	if err != nil && err != sql.ErrNoRows {
-		log.Println("models.CheckIfNameAlreadyExist err in selectCountExoplanetByNameQuery : ", err.Error())
 		return false, err
 	}
 
@@ -166,4 +166,46 @@ func GetExoplanetByID(db *sql.DB, id int) (*ExoPlanet, error) {
 
 	return &exoplanet, nil
 
+}
+
+func DeleteExoplanetByID(db *sql.DB, id int) error {
+	deleteExoplanetQuery := `Delete from exoplanets where id = ?`
+
+	_, err := db.Exec(deleteExoplanetQuery, id)
+	if err != nil {
+		log.Println("DeleteExoplanetByID error in deleteExoplanetQuery : ", err.Error())
+		return err
+	}
+	return nil
+}
+
+func FuelEstimation(db *sql.DB, toExoplanetID int, crewCapacity int) (float64, error) {
+	if crewCapacity == 0 {
+		return 0, nil
+	}
+
+	toExoplanet, err := GetExoplanetByID(db, toExoplanetID)
+	if err != nil {
+		log.Println("FuelEstimation err in GetExoplanetByID : ", err.Error())
+		return 0, err
+	}
+
+	fuelEstimate := 0.0
+
+	//mass zero indicates it's a gas giant
+	//when the planet types increase, this may change and we must check the planet_type_id or store some gravity constant in the planet_type table and use that.
+	if toExoplanet.Mass == 0 {
+		fuelEstimate = CalculateFuelEstimate(0.5, toExoplanet.Radius, float64(crewCapacity), float64(toExoplanet.DistanceFromEarth))
+	} else {
+		fuelEstimate = CalculateFuelEstimate(toExoplanet.Mass, toExoplanet.Radius, float64(crewCapacity), float64(toExoplanet.DistanceFromEarth))
+	}
+
+	return fuelEstimate, nil
+}
+
+func CalculateFuelEstimate(gravityConstant, radius, crewCapacity, distancFromEarth float64) float64 {
+
+	gravity := gravityConstant / (radius * radius)
+
+	return (distancFromEarth / (gravity * gravity)) * crewCapacity
 }
